@@ -54,7 +54,7 @@ def main():
                 print(f"✅ Sucesso: Mensagem enviada para {nome}!")
             else:
                 print(f"❌ Falha ao enviar para {nome}. Código: {resposta.status_code}")
-                print(f"Resposta da API (O erro real está aqui): {resposta.text}")
+                print(f"Resposta da API: {resposta.text}")
                 
         except Exception as e:
             print(f"Erro de conexão com Z-API: {e}")
