@@ -33,20 +33,34 @@ def main():
         print(f"Tentando enviar para {nome} (Telefone: {telefone})...")
         
         
-        url = f"https://api.z-api.io/instances/{os.getenv('ZAPI_INSTANCE_ID')}/token/{os.getenv('ZAPI_TOKEN')}/send-text"
+        instance_id = os.getenv("ZAPI_INSTANCE_ID")
+        token = os.getenv("ZAPI_TOKEN")
+
+        
+        print(f"DEBUG: Instância ID: {instance_id}")
+        print(f"DEBUG: Telefone: {telefone}")
+        print(f"DEBUG: Token: {token[:4]}****")
+
+        
+        url = f"https://api.z-api.io/instances/{instance_id}/token/{token}/send-text"
         payload = {"phone": telefone, "message": f"Olá, {nome}, tudo bem com você?"}
+        
+        
+        headers = {
+            'Client-Token': token
+        }
         
         try:
             
-            resposta = requests.post(url, json=payload)
+            resposta = requests.post(url, json=payload, headers=headers)
             
-            
+
             if resposta.status_code == 200:
                 print(f"✅ Sucesso: Mensagem enviada para {nome}!")
             else:
                 
                 print(f"❌ Falha ao enviar para {nome}. Código: {resposta.status_code}")
-                print(f"Detalhe do erro: {resposta.text}")
+                print(f"Resposta da API: {resposta.text}")
                 
         except Exception as e:
             print(f"Erro de conexão com o servidor da Z-API: {e}")
