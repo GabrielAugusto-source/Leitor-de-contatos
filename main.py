@@ -6,6 +6,16 @@ from supabase import create_client
 
 load_dotenv()
 
+instance_id = os.getenv("ZAPI_INSTANCE_ID")
+token = os.getenv("ZAPI_TOKEN")
+
+url = f"https://api.z-api.io/instances/{instance_id}/token/{token}/status"
+
+try:
+    response = requests.get(url)
+    print(f"Status da instância Z-API: {response.text}")
+except Exception as e:
+    print(f"Erro ao verificar status da instância Z-API: {e}")
 
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
