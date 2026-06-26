@@ -6,30 +6,22 @@ from supabase import create_client
 
 load_dotenv()
 
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
-
-print(f"URL do Supabase: {url}")
-print(f"Chave do Supabase: {key}")
-
-if not url or not key:
-    print("Erro: Variáveis de ambiente SUPABASE_URL ou SUPABASE_KEY não estão definidas.")
-    exit(1)
 
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
 def main():
-    
     print("Buscando contatos no Supabase...")
     
     try:
-        
         response = supabase.table("contacts").select("*").execute()
         contatos = response.data
     except Exception as e:
         print(f"Erro ao buscar contatos: {e}")
         return
     
+    if not contatos:
+        print("Nenhum contato encontrado.")
+        return
     
     for contato in contatos[:3]:
         nome = contato.get("name")
@@ -38,16 +30,26 @@ def main():
         if not nome or not telefone:
             continue
             
-        print(f"Enviando para {nome}...")
+        print(f"Tentando enviar para {nome} (Telefone: {telefone})...")
         
         
         url = f"https://api.z-api.io/instances/{os.getenv('ZAPI_INSTANCE_ID')}/token/{os.getenv('ZAPI_TOKEN')}/send-text"
         payload = {"phone": telefone, "message": f"Olá, {nome}, tudo bem com você?"}
         
         try:
-            requests.post(url, json=payload)
+            
+            resposta = requests.post(url, json=payload)
+            
+            
+            if resposta.status_code == 200:
+                print(f"✅ Sucesso: Mensagem enviada para {nome}!")
+            else:
+                
+                print(f"❌ Falha ao enviar para {nome}. Código: {resposta.status_code}")
+                print(f"Detalhe do erro: {resposta.text}")
+                
         except Exception as e:
-            print(f"Erro ao enviar para {nome}: {e}")
+            print(f"Erro de conexão com o servidor da Z-API: {e}")
 
     print("Processo finalizado!")
 
